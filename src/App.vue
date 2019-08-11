@@ -1,24 +1,32 @@
 <template>
   <div id="app">
-    <HelloWorld name="xxxxxx"></HelloWorld>
-    {{msg}}
-    {{mixinvalue}}
-    <button @click="xxx">点击</button>
+    <NewTodoList @addTodo="addTodo"></NewTodoList>
+    <TodoList :list="list"></TodoList>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Mixins } from "vue-property-decorator";
-import HelloWorld from "./components/HelloWorld.vue";
-import { MyMixin } from "./mixins/mixin-one";
+import NewTodoList from "./components/NewTodoList.vue";
+import TodoList from "./components/TodoList.vue";
+
+interface Todo {
+  name: String;
+  status: "done" | "todo" | "delete";
+}
 
 @Component({
-  components: { HelloWorld }
+  components: { NewTodoList, TodoList }
 })
-export default class App extends Mixins(MyMixin) {
-  msg = 123;
-  xxx() {
-    this.msg = 1;
+export default class App extends Vue {
+  list: Array<Todo> = [
+    { name: "任务1", status: "todo" },
+    { name: "任务2", status: "done" },
+    { name: "任务3", status: "delete" }
+  ];
+  addTodo(message: String) {
+    let todo: Todo = { name: message, status: "todo" };
+    this.list.push(todo);
   }
 }
 </script>
@@ -26,7 +34,5 @@ export default class App extends Mixins(MyMixin) {
 <style lang="scss">
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
-
-  color: red;
 }
 </style>
