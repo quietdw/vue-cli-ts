@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <NewTodoList @addTodo="addTodo"></NewTodoList>
-    <TodoList :list="list"></TodoList>
+    <TodoList :list="list" @changeStatus="changeStatus"></TodoList>
   </div>
 </template>
 
@@ -9,24 +9,28 @@
 import { Component, Vue, Mixins } from "vue-property-decorator";
 import NewTodoList from "./components/NewTodoList.vue";
 import TodoList from "./components/TodoList.vue";
-
-interface Todo {
-  name: String;
-  status: "done" | "todo" | "delete";
-}
+import Todo from "./models/Todo";
 
 @Component({
-  components: { NewTodoList, TodoList }
+  components: { NewTodoList, TodoList },
+  watch: {
+    list(oldValue, newValue) {
+      localStorage.setItem("data", JSON.stringify(newValue));
+    }
+  }
 })
 export default class App extends Vue {
-  list: Array<Todo> = [
-    { name: "任务1", status: "todo" },
-    { name: "任务2", status: "done" },
-    { name: "任务3", status: "delete" }
-  ];
+  list: Array<Todo> = localStorage.getItem("data")
+    ? JSON.parse(<string>localStorage.getItem("data"))
+    : [];
   addTodo(message: String) {
     let todo: Todo = { name: message, status: "todo" };
     this.list.push(todo);
+  }
+  changeStatus(listItem: Todo, index: number, status: Partial<Todo>) {
+    let newList = Object.assign({}, listItem, status);
+
+    this.list.splice(index, 1, newList);
   }
 }
 </script>
